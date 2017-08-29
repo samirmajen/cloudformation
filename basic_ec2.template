@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  EC2Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      SubnetId:
+        Ref: VPCSubnet
+      Monitoring: true
+      InstanceType: t2.small
+      ImageId: ami-a5c8dec1
+      SecurityGroupIds:
+        - 'Fn::GetAtt':
+            - SecurityGroup
+            - GroupId
+  ExternalIp:
+    Type: 'AWS::EC2::EIP'
+    Properties: {}
+  VPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: 10.0.0.0/24
+  VPCSubnet:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId:
+        Ref: VPC
+      CidrBlock: 10.0.0.0/24
+      AvailabilityZone: ''
+  SecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      VpcId:
+        Ref: VPC
+      GroupDescription: Website Security Group
+  ExternalIpAssociation:
+    Type: 'AWS::EC2::EIPAssociation'
+    Properties:
+      AllocationId: !Ref ExternalIp
+      InstanceId: !Ref EC2Instance
